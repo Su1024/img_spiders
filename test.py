@@ -49,6 +49,7 @@ proxies = {
 
 headers = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:57.0) Gecko/20100101 Firefox/57.0',
+    "Referer": "http://www.zhisheji.com/yuanchuang/dianpu/"
 }
 
 
@@ -84,6 +85,8 @@ def save(title, ctime, info1, view_num, tags, pic, link, db):
                   "VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"
             args = (title, tags, key, width, height, size, formats, plate_type, info1, view_num, link, ctime, hs)
             cursor.execute(sql, args)
+            sql = "DELETE FROM zhesheji_links WHERE link = '%s'" % (link)
+            cursor.execute(sql)
         except Exception as e:
             print('Insert Error：', e, link, sql)
             db.rollback()
@@ -107,7 +110,6 @@ def open_link():
                 tree = etree.HTML(html)
                 title = tree.xpath("//div[@class='content-tit']//h1/text()")
                 pics = tree.xpath('//div[@class="cpimgbox"]/img/@data-path')
-                ctime = re.findall(r'^http://img.zhisheji.com/(.*?)\?imageMogr2/quality/90$', pics[0])[0][0:8]
                 info = tree.xpath("//div[@class='content-tit']//div[@class='times']/a[2]/text()")
                 view_num = tree.xpath("//div[@class='content-tit']//div[@class='infos']/em[1]/text()")
                 tags = tree.xpath("//div[@class='wrap ct-tip']//div[@class='tag']/a/text()")
@@ -132,26 +134,26 @@ def open_link():
                     view_num = re.sub("[^0-9]", "", view_num[0])
                 else:
                     view_num = "0"
+
+                ctime = ""
+
+                if pics:
+                    pics = "||".join(pics).replace('?imageMogr2/quality/90', '').split('||')
+                    ctime = re.findall(r'^http://img.zhisheji.com/(.*?)$', pics[0])[0][0:8]
+
                 if ctime:
-                    ctime = datetime.datetime.strptime(ctime, "%Y%m%d").strftime("%Y-%m-%d")
+                    try:
+                        ctime = datetime.datetime.strptime(ctime, "%Y%m%d").strftime("%Y-%m-%d")
+                    except:
+                        ctime = '0000-00-00 00:00:00'
                 else:
                     ctime = '0000-00-00 00:00:00'
 
-                if pics:
-                    for pic in pics:
-                        pic = pic.replace('?imageMogr2/quality/90', '', 1)
-                        save(title, ctime, info1, int(view_num), tags, pic, link, db)
-                try:
-                    cursor = db.cursor()
-                    sql = "DELETE FROM zhesheji_links WHERE link = '%s'" % (link)
-                    cursor.execute(sql)
-                except Exception as e:
-                    print('Delete Error：', e, link, sql)
-                    db.rollback()
-                else:
-                    db.commit()
-            except error.HTTPError as e:
-                print("HTTPError：", e.code, threading.current_thread().name)
+                for pic in pics:
+                    pic = pic.replace('?imageMogr2/quality/90', '', 1)
+                    save(title, ctime, info1, int(view_num), tags, pic, link, db)
+            except Exception as e:
+                print("Error：", e, threading.current_thread().name)
         except StopIteration as e:
             print('Generator return value:', e.value, threading.current_thread().name)
             break

@@ -22,3 +22,7 @@ class ImgSpidersItem(scrapy.Item):
     size = scrapy.Field()
     formats = scrapy.Field()
     plate_type = scrapy.Field()
+
+
+class SheJiDiGuo(scrapy.Item):
+    link = scrapy.Field()
