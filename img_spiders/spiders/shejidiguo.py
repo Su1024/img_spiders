@@ -17,13 +17,13 @@ class ShejidiguoSpider(Spider):
     def start_requests(self):
         start_urls = ["http://www.warting.com/gallery/list_{}.html".format(i) for i in range(1, 856)]
         for url in start_urls:
-            yield Request(url, dont_filter=True,headers=self.headers)
+            yield Request(url,headers=self.headers)
 
     def parse(self, response):
         base_url = "http://www.warting.com"
         page_list = response.xpath("//div[@class='pic_list']//a[@class='pic']/@href").extract()
         for page in page_list:
-            yield Request(base_url + page, callback=self.parse_detail,dont_filter=True, meta={
+            yield Request(base_url + page, callback=self.parse_detail,meta={
                 "link": base_url + page
             })
 
