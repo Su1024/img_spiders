@@ -8,6 +8,7 @@
 #     https://doc.scrapy.org/en/latest/topics/settings.html
 #     https://doc.scrapy.org/en/latest/topics/downloader-middleware.html
 #     https://doc.scrapy.org/en/latest/topics/spider-middleware.html
+import random
 
 BOT_NAME = 'img_spiders'
 
@@ -40,10 +41,16 @@ CONCURRENT_REQUESTS_PER_DOMAIN = 500
 # TELNETCONSOLE_ENABLED = False
 
 # Override the default request headers:
-# DEFAULT_REQUEST_HEADERS = {
-#   'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-#   'Accept-Language': 'en',
-# }
+DEFAULT_REQUEST_HEADERS = {
+    'accept':'application/json, text/plain, */*',
+    'Accept-Encoding':'gzip, deflate, sdch',
+    'Accept-Language':'zh-CN,zh;q=0.8',
+    'Connection':'keep-alive',
+    'Host':'www.zhihu.com',
+    'Referer':'http://www.warting.com/',
+    'x-udid':'AIDAV7HBLwqPTulyfqA9p0CFbRlOL10cidE=',
+    'User-Agent':"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:57.0) Gecko/20100101 Firefox/57.0"
+}
 
 # Enable or disable spider middlewares
 # See https://doc.scrapy.org/en/latest/topics/spider-middleware.html
@@ -79,6 +86,21 @@ MYSQLINFO = {
     'passwd': 'Su_s1326@aiji',
     'charset': 'utf8'
 }
+
+# DOWNLOAD_FAIL_ON_DATALOSS = False
+
+# 配置请求调度器实现 使用 scrapy-redis 实现方案
+SCHEDULER='scrapy_redis.scheduler.Scheduler'
+# 请求去重方案,设置去重类
+DUPEFILTER_CLASS = "scrapy_redis.dupefilter.RFPDupeFilter"
+# 让请求持久化
+SCHEDULER_PERSIST = True
+
+# scrapy-redis 的redis 服务器配置
+# REDIS_URL = "redis://127.0.0.1:6379"
+# 或者使用下面的方式
+REDIS_HOST = "127.0.0.1"
+REDIS_PORT = 6379
 
 # Enable and configure the AutoThrottle extension (disabled by default)
 # See https://doc.scrapy.org/en/latest/topics/autothrottle.html

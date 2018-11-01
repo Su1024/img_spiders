@@ -4,25 +4,26 @@ from scrapy import Request
 import re
 
 from img_spiders.items import SheJiDiGuo
+from scrapy_redis.spiders import RedisSpider as Spider
 
-
-class ShejidiguoSpider(scrapy.Spider):
+class ShejidiguoSpider(Spider):
     name = 'shejidiguo'
     allowed_domains = ['www.warting.com']
     headers = {
         "Referer": "http://www.warting.com/"
     }
+    redis_key = "shejidiguo:start_url"
 
     def start_requests(self):
         start_urls = ["http://www.warting.com/gallery/list_{}.html".format(i) for i in range(1, 856)]
         for url in start_urls:
-            yield Request(url, headers=self.headers)
+            yield Request(url, dont_filter=True,headers=self.headers)
 
     def parse(self, response):
         base_url = "http://www.warting.com"
         page_list = response.xpath("//div[@class='pic_list']//a[@class='pic']/@href").extract()
         for page in page_list:
-            yield Request(base_url + page, callback=self.parse_detail, meta={
+            yield Request(base_url + page, callback=self.parse_detail,dont_filter=True, meta={
                 "link": base_url + page
             })
 
