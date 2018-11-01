@@ -11,6 +11,9 @@ from qiniu import Auth, BucketManager
 import json
 import threading
 from lxml import etree
+import http.client
+http.client.HTTPConnection._http_vsn = 10
+http.client.HTTPConnection._http_vsn_str = 'HTTP/1.0'
 
 # db_host = 'sh-cdb-1vh4kpv4.sql.tencentcdb.com'
 db_host = '172.16.0.32'
@@ -20,7 +23,7 @@ db_port = 3306
 db_name = 'bizhi'
 db_charset = 'utf8'
 
-threadNum = 500  # 开启线程个数
+threadNum = 50  # 开启线程个数
 lock = threading.Lock()
 
 access_key = 'Uon2lwH6FDLYBhVyGu5jN25PwVCQuNAIf-_PaQ8E'
@@ -66,6 +69,7 @@ def save(title, ctime, info1, view_num, tags, pic, link, db):
         print("开始保存图片：", pic)
         ret, info = bucket.fetch(pic, bucket_name, key)
         assert ret['key'] == key
+        print("保存成功",pic)
         hs = json.loads(info.text_body, encoding="utf-8")['hash']
         url = "http://img.aiji66.com/{}?imageInfo".format(key)
         response = requests.get(url=url)
@@ -92,8 +96,8 @@ def save(title, ctime, info1, view_num, tags, pic, link, db):
             db.rollback()
         else:
             db.commit()
-    except:
-        print("上传失败链接:" + link)
+    except Exception as e:
+        print("上传失败链接:" ,link)
     return None
 
 
@@ -110,9 +114,9 @@ def open_link():
                 tree = etree.HTML(html)
                 title = tree.xpath("//div[@class='content-tit']//h1/text()")
                 pics = tree.xpath('//div[@class="cpimgbox"]/img/@data-path')
-                info = tree.xpath("//div[@class='content-tit']//div[@class='times']/a[2]/text()")
+                info = tree.xpath("//div[@class='infos']//a[last()]/text()")
                 view_num = tree.xpath("//div[@class='content-tit']//div[@class='infos']/em[1]/text()")
-                tags = tree.xpath("//div[@class='wrap ct-tip']//div[@class='tag']/a/text()")
+                tags = tree.xpath("//div[@class='tag']/a/text()")
 
                 if info:
                     infos = info[0].split("/")
@@ -150,7 +154,7 @@ def open_link():
                     ctime = '0000-00-00 00:00:00'
 
                 for pic in pics:
-                    pic = pic.replace('?imageMogr2/quality/90', '', 1)
+                    pic = pic.rsplit("?")[0]
                     save(title, ctime, info1, int(view_num), tags, pic, link, db)
             except Exception as e:
                 print("Error：", e, threading.current_thread().name)

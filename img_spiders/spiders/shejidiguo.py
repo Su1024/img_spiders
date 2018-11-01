@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 import scrapy
-from scrapy import Request
+from scrapy import Request, Spider
 import re
 
 from img_spiders.items import SheJiDiGuo
-from scrapy_redis.spiders import RedisSpider as Spider
+
 
 class ShejidiguoSpider(Spider):
     name = 'shejidiguo'
@@ -12,7 +12,6 @@ class ShejidiguoSpider(Spider):
     headers = {
         "Referer": "http://www.warting.com/"
     }
-    redis_key = "shejidiguo:start_url"
 
     def start_requests(self):
         start_urls = ["http://www.warting.com/gallery/list_{}.html".format(i) for i in range(1, 856)]

@@ -87,20 +87,24 @@ MYSQLINFO = {
     'charset': 'utf8'
 }
 
-# DOWNLOAD_FAIL_ON_DATALOSS = False
 
-# 配置请求调度器实现 使用 scrapy-redis 实现方案
-SCHEDULER='scrapy_redis.scheduler.Scheduler'
-# 请求去重方案,设置去重类
-DUPEFILTER_CLASS = "scrapy_redis.dupefilter.RFPDupeFilter"
-# 让请求持久化
+# Ensure use this Scheduler
+SCHEDULER = "scrapy_redis_bloomfilter.scheduler.Scheduler"
+
+# Ensure all spiders share same duplicates filter through redis
+DUPEFILTER_CLASS = "scrapy_redis_bloomfilter.dupefilter.RFPDupeFilter"
+
+# Redis URL
+REDIS_URL = 'redis://127.0.0.1:6379'
+
+# Number of Hash Functions to use, defaults to 6
+BLOOMFILTER_HASH_NUMBER = 8
+
+# Redis Memory Bit of Bloomfilter Usage, 30 means 2^30 = 128MB, defaults to 30
+BLOOMFILTER_BIT = 30
+
+# Persist
 SCHEDULER_PERSIST = True
-
-# scrapy-redis 的redis 服务器配置
-# REDIS_URL = "redis://127.0.0.1:6379"
-# 或者使用下面的方式
-REDIS_HOST = "127.0.0.1"
-REDIS_PORT = 6379
 
 # Enable and configure the AutoThrottle extension (disabled by default)
 # See https://doc.scrapy.org/en/latest/topics/autothrottle.html
