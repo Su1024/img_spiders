@@ -38,7 +38,7 @@ class ShejidiguoSpider(scrapy.Spider):
             page_num = re.findall(r'^共(.*?)页$', page_num)[0]
             links_list = [base_url.format(i) for i in range(2, int(page_num) + 1)]
         links_list.append(link)
-        for  link in links_list:
+        for link in links_list:
             item = SheJiDiGuo()
             item['link'] = link
-            yield item
+            yield (item)

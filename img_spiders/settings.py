@@ -14,7 +14,7 @@ BOT_NAME = 'img_spiders'
 SPIDER_MODULES = ['img_spiders.spiders']
 NEWSPIDER_MODULE = 'img_spiders.spiders'
 
-LOG_LEVEL="WARNING"
+LOG_LEVEL = "WARNING"
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:57.0) Gecko/20100101 Firefox/57.0'
@@ -23,14 +23,14 @@ USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:57.0) Gecko/20100101 
 ROBOTSTXT_OBEY = False
 
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
-# CONCURRENT_REQUESTS = 50
+CONCURRENT_REQUESTS = 500
 
 # Configure a delay for requests for the same website (default: 0)
 # See https://doc.scrapy.org/en/latest/topics/settings.html#download-delay
 # See also autothrottle settings and docs
-# DOWNLOAD_DELAY = 0.9
+# DOWNLOAD_DELAY = 0.1
 # The download delay setting will honor only one of:
-# CONCURRENT_REQUESTS_PER_DOMAIN = 50
+CONCURRENT_REQUESTS_PER_DOMAIN = 500
 # CONCURRENT_REQUESTS_PER_IP = 16
 
 # Disable cookies (enabled by default)
@@ -67,15 +67,18 @@ DOWNLOADER_MIDDLEWARES = {
 # Configure item pipelines
 # See https://doc.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
-   'img_spiders.pipelines.MySQLPipeline': 300,
+    'img_spiders.pipelines.MysqlTwistedPipline': 25,
 }
 
 # mysql 配置
-MYSQL_DB_NAME = 'bizhi'
-MYSQL_HOST = '172.16.0.32'
-MYSQL_USER = 's1326_aiji66'
-MYSQL_PASSWORD = 'Su_s1326@aiji'
 
+MYSQLINFO = {
+    'db': 'bizhi',
+    'host': '172.16.0.32',
+    'user': 's1326_aiji66',
+    'passwd': 'Su_s1326@aiji',
+    'charset': 'utf8'
+}
 
 # Enable and configure the AutoThrottle extension (disabled by default)
 # See https://doc.scrapy.org/en/latest/topics/autothrottle.html
@@ -97,4 +100,3 @@ MYSQL_PASSWORD = 'Su_s1326@aiji'
 # HTTPCACHE_DIR = 'httpcache'
 # HTTPCACHE_IGNORE_HTTP_CODES = []
 # HTTPCACHE_STORAGE = 'scrapy.extensions.httpcache.FilesystemCacheStorage'
-

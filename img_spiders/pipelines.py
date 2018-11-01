@@ -5,39 +5,37 @@
 # Don't forget to add your pipeline to the ITEM_PIPELINES setting
 # See: https://doc.scrapy.org/en/latest/topics/item-pipeline.html
 import pymysql
-from scrapy.utils.project import get_project_settings
-
-class MySQLPipeline(object):
-
-    # 打开数据库
+from twisted.enterprise import adbapi
+class MysqlTwistedPipline(object):
     def open_spider(self, spider):
-        db = spider.settings.get('MYSQL_DB_NAME','scrapy_db')
-        host = spider.settings.get('MYSQL_HOST', 'localhost')
-        port = spider.settings.get('MYSQL_PORT', 3306)
-        user = spider.settings.get('MYSQL_USER', 'root')
-        passwd = spider.settings.get('MYSQL_PASSWORD', '123456')
+        self.dbpool = adbapi.ConnectionPool("pymysql", **spider.settings.get('MYSQLINFO'),cursorclass=pymysql.cursors.DictCursor)
 
-        self.db_conn =pymysql.connect(host=host, port=port, db=db, user=user, passwd=passwd, charset='utf8')
-        self.db_cur = self.db_conn.cursor()
-
-    # 关闭数据库
-    def close_spider(self, spider):
-        self.db_conn.commit()
-        self.db_conn.close()
-
-    # 对数据进行处理
+    # 使用twisted将mysql插入变成异步执行
     def process_item(self, item, spider):
-        self.insert_db(item)
-        return item
+        # 指定操作方法和操作的数据
+        query = self.dbpool.runInteraction(self.do_insert, item)
+        # 指定异常处理方法
+        query.addErrback(self.handle_error, item, spider) #处理异常
 
-    #插入数据
-    def insert_db(self, item):
-        values = (
-            item['link']
-        )
+    def handle_error(self, failure, item, spider):
+        #处理异步插入的异常
+        print (failure)
 
-        sql = 'INSERT INTO shejidiguo_links (link) VALUES(%s)'
-        self.db_cur.execute(sql, values)
+    def do_insert(self, cursor, item):
+        #执行具体的插入
+        #根据不同的item 构建不同的sql语句并插入到mysql中
+        insert_sql, params = self.get_insert_sql(item)
+        cursor.execute(insert_sql, params)
+        print("链接地址保存成功:", item['link'])
+
+    def get_insert_sql(self,item):
+        insert_sql = """
+                     INSERT INTO shejidiguo_links (link) VALUES(%s);
+                 """
+        params = (
+            item['link'])
+        return insert_sql, params
+
 
 
 class ImgSpidersPipeline(object):
