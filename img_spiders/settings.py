@@ -18,20 +18,19 @@ NEWSPIDER_MODULE = 'img_spiders.spiders'
 LOG_LEVEL = "WARNING"
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
-USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:57.0) Gecko/20100101 Firefox/57.0'
 
 # Obey robots.txt rules
 ROBOTSTXT_OBEY = False
 
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
-CONCURRENT_REQUESTS = 500
+# CONCURRENT_REQUESTS = 500
 
 # Configure a delay for requests for the same website (default: 0)
 # See https://doc.scrapy.org/en/latest/topics/settings.html#download-delay
 # See also autothrottle settings and docs
 # DOWNLOAD_DELAY = 0.1
 # The download delay setting will honor only one of:
-CONCURRENT_REQUESTS_PER_DOMAIN = 500
+# CONCURRENT_REQUESTS_PER_DOMAIN = 500
 # CONCURRENT_REQUESTS_PER_IP = 16
 
 # Disable cookies (enabled by default)
@@ -46,10 +45,9 @@ DEFAULT_REQUEST_HEADERS = {
     'Accept-Encoding':'gzip, deflate, sdch',
     'Accept-Language':'zh-CN,zh;q=0.8',
     'Connection':'keep-alive',
-    'Host':'www.zhihu.com',
-    'Referer':'http://www.warting.com/',
-    'x-udid':'AIDAV7HBLwqPTulyfqA9p0CFbRlOL10cidE=',
-    'User-Agent':"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:57.0) Gecko/20100101 Firefox/57.0"
+    'Host':'www.sj33.cn',
+    'Cookie': 'UM_distinctid=166ce35b4b4167-0861c8679518cc-b79193d-1fa400-166ce35b4bb321; Hm_lvt_32bdb1892164631690e25a7c7a5fd2f6=1541057918,1541059067; CNZZDATA30089843=cnzz_eid%3D537325359-1541056540-null%26ntime%3D1541056540; __51cke__=; __tins__16734211=%7B%22sid%22%3A%201541059111401%2C%20%22vd%22%3A%202%2C%20%22expires%22%3A%201541061000015%7D; __51laig__=2; Hm_lpvt_32bdb1892164631690e25a7c7a5fd2f6=1541060493; CNZZDATA30058505=cnzz_eid%3D703386626-1541054805-%26ntime%3D1541060208',
+    'User-Agent':"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.67 Safari/537.36"
 }
 
 # Enable or disable spider middlewares
@@ -60,10 +58,10 @@ DEFAULT_REQUEST_HEADERS = {
 
 # Enable or disable downloader middlewares
 # See https://doc.scrapy.org/en/latest/topics/downloader-middleware.html
-DOWNLOADER_MIDDLEWARES = {
-    'scrapy.downloadermiddlewares.httpproxy.HttpProxyMiddleware': 110,
-    'img_spiders.middlewares.ProxyMiddleware': 100
-}
+# DOWNLOADER_MIDDLEWARES = {
+#     'scrapy.downloadermiddlewares.httpproxy.HttpProxyMiddleware': 110,
+#     'img_spiders.middlewares.ProxyMiddleware': 100
+# }
 
 # Enable or disable extensions
 # See https://doc.scrapy.org/en/latest/topics/extensions.html
@@ -89,22 +87,22 @@ MYSQLINFO = {
 
 
 # Ensure use this Scheduler
-SCHEDULER = "scrapy_redis_bloomfilter.scheduler.Scheduler"
+# SCHEDULER = "scrapy_redis_bloomfilter.scheduler.Scheduler"
 
-# Ensure all spiders share same duplicates filter through redis
-DUPEFILTER_CLASS = "scrapy_redis_bloomfilter.dupefilter.RFPDupeFilter"
-
-# Redis URL
-REDIS_URL = 'redis://127.0.0.1:6379'
-
-# Number of Hash Functions to use, defaults to 6
-BLOOMFILTER_HASH_NUMBER = 8
-
-# Redis Memory Bit of Bloomfilter Usage, 30 means 2^30 = 128MB, defaults to 30
-BLOOMFILTER_BIT = 30
-
-# Persist
-SCHEDULER_PERSIST = True
+# # Ensure all spiders share same duplicates filter through redis
+# DUPEFILTER_CLASS = "scrapy_redis_bloomfilter.dupefilter.RFPDupeFilter"
+#
+# # Redis URL
+# REDIS_URL = 'redis://127.0.0.1:6379'
+#
+# # Number of Hash Functions to use, defaults to 6
+# BLOOMFILTER_HASH_NUMBER = 8
+#
+# # Redis Memory Bit of Bloomfilter Usage, 30 means 2^30 = 128MB, defaults to 30
+# BLOOMFILTER_BIT = 30
+#
+# # Persist
+# SCHEDULER_PERSIST = True
 
 # Enable and configure the AutoThrottle extension (disabled by default)
 # See https://doc.scrapy.org/en/latest/topics/autothrottle.html
