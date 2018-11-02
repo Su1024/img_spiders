@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-import traceback
 from urllib import request
 from urllib import error
 import re
@@ -22,7 +21,7 @@ db_port = 3306
 db_name = 'bizhi'
 db_charset = 'utf8'
 
-threadNum = 1  # 开启线程个数
+threadNum = 1000  # 开启线程个数
 lock = threading.Lock()
 
 access_key = 'Uon2lwH6FDLYBhVyGu5jN25PwVCQuNAIf-_PaQ8E'
@@ -34,8 +33,8 @@ bucket = BucketManager(q)
 # 代理服务器
 proxyHost = "http-dyn.abuyun.com"
 proxyPort = "9020"
-proxyUser = "H2627725J2ZOC92P"
-proxyPass = "CE33E039E373395F"
+proxyUser = "HC08B1JNL576QO8D"
+proxyPass = "4C27A88C03D1E661"
 
 proxyMeta = "http://%(user)s:%(pass)s@%(host)s:%(port)s" % {
     "host": proxyHost,
@@ -54,7 +53,7 @@ headers = {
     "Referer": "http://www.warting.com/gallery/"
 }
 
-def save(title, ctime, info1, tags, pic, link, db):
+def save(title, ctime, tags, info1, info2, info3, pic, link, db):
     cursor = db.cursor()
     ext = pic.split('.')
     if ext:
@@ -83,11 +82,11 @@ def save(title, ctime, info1, tags, pic, link, db):
         if width == height:
             plate_type = 3
         try:
-            sql = "INSERT INTO shejidiguo (title,tags,cdn_path,width,height,size,format,plate_type,info1,link,ctime,hash) " \
-                  "VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"
-            args = (title, tags, key, width, height, size, formats, plate_type, info1, link, ctime, hs)
+            sql = "INSERT INTO shejizhijia (title,tags,cdn_path,width,height,size,format,plate_type,info1,info2,info3,link,ctime,hash) " \
+                  "VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"
+            args = (title, tags, key, width, height, size, formats, plate_type, info1, info2,info3,link, ctime, hs)
             cursor.execute(sql, args)
-            sql = "DELETE FROM shejidiguo_links WHERE link = '%s'" % (link)
+            sql = "DELETE FROM shejizhijia_links WHERE link = '%s'" % (link)
             cursor.execute(sql)
         except Exception as e:
             print('Insert Error：', e, link, sql)
@@ -104,25 +103,29 @@ def open_link():
     global start
     while True:
         try:
-            # link = next(start)
-            link = "http://www.warting.com/gallery/201711/233053_10.html"
+            link = next(start)
             print("爬取：" + link)
             response = requests.get(url=link, headers=headers)
             try:
-                html = response.content.decode('gbk')
+                html = response.content.decode()
                 tree = etree.HTML(html)
-                title = tree.xpath("//div[@class='mainleft']//h1/text()")
-                pics = tree.xpath("//div[@class='mainleft']//ul[@class='picshow_first']//img/@src")
-                info = tree.xpath("//div[@class='auto location']//a[last()]/text()")
-                tags = tree.xpath("//div[@class='article_tags']//a/text()")
-                ctime = tree.xpath("//div[@class='article_info']//li[@class='time']/text()")
+                title = tree.xpath("//div[@class='articlebox']/h1/text()")
+                pics = tree.xpath("//div[@class='articlebox']/div[@class='artcon']//img/@src")
+                info = tree.xpath("//div[@id='loat6']/a[position()>1]/text()")
+                tags = tree.xpath("//div[@class='zuozhe1']/a/text()")
+                ctime = tree.xpath("//div[@class='zuozhe1']/text()")
 
                 if info:
-                    infos = info[0].split("/")
-                    info1 = infos[0]
-                    tags.extend(infos)
+                    keys = ["info1", "info2", "info3"]
+                    infos = dict(zip(keys, info))
+                    info1 = infos.get('info1', '')
+                    info2 = infos.get('info2', '')
+                    info3 = infos.get('info3', '')
+                    tags.extend(info)
                 else:
                     info1 = ""
+                    info2 = ""
+                    info3 = ""
 
                 if title:
                     title = title[0]
@@ -134,14 +137,14 @@ def open_link():
                     tags = ''
 
                 if ctime:
-                    ctime = "".join(ctime).split()[1]
+                    ctime = re.findall(r'(\d{4}-\d{1,2}-\d{1,2})', ctime[0])[0]
                 else:
                     ctime = '0000-00-00 00:00:00'
 
                 if pics:
                     for pic in pics:
                         pic = pic.rsplit("?")[0]
-                        save(title, ctime, info1, tags, pic, link, db)
+                        save(title, ctime, tags, info1, info2, info3, pic,link, db)
             except Exception as e:
                 print("Error：", e, threading.current_thread().name)
         except StopIteration as e:
@@ -152,7 +155,7 @@ def open_link():
 def main():
     db = pymysql.connect(db_host, db_user, db_password, db_name, charset=db_charset, port=db_port)
     cursor = db.cursor()
-    sql = "SELECT link FROM shejidiguo_links order by id asc "
+    sql = "SELECT link FROM shejizhijia_links order by id asc "
     cursor.execute(sql)
     result = cursor.fetchall()
     db.close()

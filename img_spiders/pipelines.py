@@ -30,13 +30,10 @@ class MysqlTwistedPipline(object):
 
     def get_insert_sql(self,item):
         insert_sql = """
-                     INSERT INTO shejidiguo_links (link) VALUES(%s);
+                     INSERT INTO shejizhijia_links (link) VALUES(%s);
                  """
         params = (
             item['link'])
         return insert_sql, params
 
 
-
-class ImgSpidersPipeline(object):
-    pass

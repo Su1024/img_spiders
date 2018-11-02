@@ -50,28 +50,39 @@ class ShejizhijiaSpider(Spider):
 
         for send_men_link in send_men_link_list:
             url = self.base_url.format(send_men_link)
-            yield Request(url, callback=self.parse_page_link,meta={"first_url":url})
+            yield Request(url, callback=self.parse_page_link, meta={"first_url": url})
 
     def parse_page_link(self, response):
         first_url = response.meta.get('first_url')
-        print("--" * 30)
-        print(response.url)
+        total_num = response.xpath("//div[@class='showpage']/a[last()-1]/text()").extract_first()
+        if not total_num:
+            total_num = 2
+        for page_num in range(1, int(total_num) + 1):
+            next_url = "P{}.html".format(page_num)
+            yield Request(first_url + "/" + next_url, callback=self.parse_page_link2)
+
+    def parse_page_link2(self, response):
         page_links = response.xpath("//ul[@class='imglist2']/li/div[1]/a[1]/@href").extract()
-        print(page_links)
         for page_link in page_links:
+            url = self.base_url.format(page_link)
+            yield Request(url=url,callback=self.parse_detail,meta={
+                "link": url
+            })
+    def parse_detail(self,response):
+        link = response.meta.get("link")
+
+        links_list = []
+        page_num = response.xpath("//div[@class='showpage']/a[last()-1]/text()").extract_first()
+
+        if page_num:
+            a = response.url.rsplit(".", 1)
+            a.insert(1, "_{}.")
+            base_url = "".join(a)
+            links_list = [base_url.format(i) for i in range(2, int(page_num) + 1)]
+        links_list.append(link)
+        for link in links_list:
             item = SheJiDiGuo()
-            item['link'] = self.base_url.format(page_link)
-            print(item)
-
-        next_url = response.xpath("//div[@class='showpage']/a[last()]/@href").extract_first()
-
-        if next_url:
-            print(first_url +"/"+ next_url)
-            yield Request(first_url +"/"+ next_url, callback=self.parse_page_link,meta={"first_url":first_url})
-
-if __name__ == '__main__':
-    str="http://www.sj33.cn/article/visj/P2.html"
-    print(str.rsplit('/'))
-
+            item['link'] = link
+            yield (item)
 
 

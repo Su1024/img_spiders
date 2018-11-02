@@ -4,37 +4,24 @@
 #
 # See documentation in:
 # https://doc.scrapy.org/en/latest/topics/spider-middleware.html
+import base64
 
 from scrapy import signals
+import base64
+
+""" 阿布云ip代理配置，包括账号密码 """
+proxyServer = "http://http-dyn.abuyun.com:9020"
+proxyUser = "H2627725J2ZOC92P"
+proxyPass = "CE33E039E373395F"
+# for Python3
+proxyAuth = "Basic " + base64.urlsafe_b64encode(bytes((proxyUser + ":" + proxyPass), "ascii")).decode("utf8")
 
 
-class ProxyMiddleware(object):
-    """
-        代理ip 中间件
-    """
+class ABProxyMiddleware(object):
+    """ 阿布云ip代理配置 """
     def process_request(self, request, spider):
-        # 代理服务器
-        proxyHost = "http-dyn.abuyun.com"
-        proxyPort = "9020"
-        proxyUser = "HC08B1JNL576QO8D"
-        proxyPass = "4C27A88C03D1E661"
-
-        proxyMeta = "http://%(user)s:%(pass)s@%(host)s:%(port)s" % {
-            "host": proxyHost,
-            "port": proxyPort,
-            "user": proxyUser,
-            "pass": proxyPass,
-        }
-
-        proxies = {
-            "http": proxyMeta,
-            "https": proxyMeta,
-        }
-
-        if request.url.startswith("http://"):
-            request.meta['proxy'] = proxies.get("http")
-        elif request.url.startswith("https://"):
-            request.meta['proxy'] = proxies.get("https")
+        request.meta["proxy"] = proxyServer
+        request.headers["Proxy-Authorization"] = proxyAuth
 
 
 class ImgSpidersSpiderMiddleware(object):
