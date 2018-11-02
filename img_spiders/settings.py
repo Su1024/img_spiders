@@ -51,8 +51,6 @@ DEFAULT_REQUEST_HEADERS = {
     'Accept-Encoding':'gzip, deflate, sdch',
     'Accept-Language':'zh-CN,zh;q=0.8',
     'Connection':'keep-alive',
-    'Host':'www.sj33.cn',
-    'Cookie': 'UM_distinctid=166ce35b4b4167-0861c8679518cc-b79193d-1fa400-166ce35b4bb321; Hm_lvt_32bdb1892164631690e25a7c7a5fd2f6=1541057918,1541059067; CNZZDATA30089843=cnzz_eid%3D537325359-1541056540-null%26ntime%3D1541056540; __51cke__=; __tins__16734211=%7B%22sid%22%3A%201541059111401%2C%20%22vd%22%3A%202%2C%20%22expires%22%3A%201541061000015%7D; __51laig__=2; Hm_lpvt_32bdb1892164631690e25a7c7a5fd2f6=1541060493; CNZZDATA30058505=cnzz_eid%3D703386626-1541054805-%26ntime%3D1541060208',
     'User-Agent':"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.67 Safari/537.36"
 }
 

@@ -22,7 +22,7 @@ db_port = 3306
 db_name = 'bizhi'
 db_charset = 'utf8'
 
-threadNum = 1  # 开启线程个数
+threadNum = 10  # 开启线程个数
 lock = threading.Lock()
 
 access_key = 'Uon2lwH6FDLYBhVyGu5jN25PwVCQuNAIf-_PaQ8E'
@@ -32,8 +32,8 @@ q = Auth(access_key, secret_key)
 bucket = BucketManager(q)
 
 # 代理服务器
-proxyHost = "http-dyn.abuyun.com"
-proxyPort = "9020"
+proxyHost = "http-pro.abuyun.com"
+proxyPort = "9010"
 proxyUser = "H2627725J2ZOC92P"
 proxyPass = "CE33E039E373395F"
 
@@ -49,10 +49,12 @@ proxies = {
     "https": proxyMeta,
 }
 
+
 headers = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:57.0) Gecko/20100101 Firefox/57.0',
     "Referer": "http://www.warting.com/gallery/"
 }
+
 
 def save(title, ctime, info1, tags, pic, link, db):
     cursor = db.cursor()
@@ -67,7 +69,7 @@ def save(title, ctime, info1, tags, pic, link, db):
         print("开始保存图片：", pic)
         ret, info = bucket.fetch(pic, bucket_name, key)
         assert ret['key'] == key
-        print("保存成功",pic)
+        print("保存成功", pic)
         hs = json.loads(info.text_body, encoding="utf-8")['hash']
         url = "http://img.aiji66.com/{}?imageInfo".format(key)
         response = requests.get(url=url)
@@ -95,7 +97,7 @@ def save(title, ctime, info1, tags, pic, link, db):
         else:
             db.commit()
     except Exception as e:
-        print("上传失败链接:" ,link,e)
+        print("上传失败链接:", link, e)
     return None
 
 
@@ -104,10 +106,9 @@ def open_link():
     global start
     while True:
         try:
-            # link = next(start)
-            link = "http://www.warting.com/gallery/201711/233053_10.html"
+            link = next(start)
             print("爬取：" + link)
-            response = requests.get(url=link, headers=headers)
+            response = requests.get(url=link, headers=headers, proxies=proxies)
             try:
                 html = response.content.decode('gbk')
                 tree = etree.HTML(html)
@@ -140,7 +141,6 @@ def open_link():
 
                 if pics:
                     for pic in pics:
-                        pic = pic.rsplit("?")[0]
                         save(title, ctime, info1, tags, pic, link, db)
             except Exception as e:
                 print("Error：", e, threading.current_thread().name)

@@ -13,12 +13,12 @@ import base64
 proxyServer = "http://http-dyn.abuyun.com:9020"
 proxyUser = "H2627725J2ZOC92P"
 proxyPass = "CE33E039E373395F"
-# for Python3
 proxyAuth = "Basic " + base64.urlsafe_b64encode(bytes((proxyUser + ":" + proxyPass), "ascii")).decode("utf8")
 
 
 class ABProxyMiddleware(object):
     """ 阿布云ip代理配置 """
+
     def process_request(self, request, spider):
         request.meta["proxy"] = proxyServer
         request.headers["Proxy-Authorization"] = proxyAuth
