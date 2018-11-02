@@ -10,7 +10,7 @@ from scrapy import signals
 import base64
 
 """ 阿布云ip代理配置，包括账号密码 """
-proxyServer = "http://http-dyn.abuyun.com:9020"
+proxyServer = "http://http-pro.abuyun.com:9010"
 proxyUser = "H2627725J2ZOC92P"
 proxyPass = "CE33E039E373395F"
 proxyAuth = "Basic " + base64.urlsafe_b64encode(bytes((proxyUser + ":" + proxyPass), "ascii")).decode("utf8")
