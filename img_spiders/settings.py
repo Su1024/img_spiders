@@ -22,6 +22,7 @@ LOG_LEVEL = "WARNING"
 # Obey robots.txt rules
 ROBOTSTXT_OBEY = False
 
+# HTTPERROR_ALLOWED_CODES = [429]
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
 CONCURRENT_REQUESTS = 300
 
@@ -46,13 +47,13 @@ CONCURRENT_REQUESTS_PER_DOMAIN = 300
 # TELNETCONSOLE_ENABLED = False
 
 # Override the default request headers:
-DEFAULT_REQUEST_HEADERS = {
-    'accept':'application/json, text/plain, */*',
-    'Accept-Encoding':'gzip, deflate, sdch',
-    'Accept-Language':'zh-CN,zh;q=0.8',
-    'Connection':'keep-alive',
-    'User-Agent':"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.67 Safari/537.36"
-}
+# DEFAULT_REQUEST_HEADERS = {
+#     'accept':'application/json, text/plain, */*',
+#     'Accept-Encoding':'gzip, deflate, sdch',
+#     'Accept-Language':'zh-CN,zh;q=0.8',
+#     'Connection':'keep-alive',
+#     'User-Agent':"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.67 Safari/537.36"
+# }
 
 # Enable or disable spider middlewares
 # See https://doc.scrapy.org/en/latest/topics/spider-middleware.html
@@ -63,7 +64,7 @@ DEFAULT_REQUEST_HEADERS = {
 # Enable or disable downloader middlewares
 # See https://doc.scrapy.org/en/latest/topics/downloader-middleware.html
 # DOWNLOADER_MIDDLEWARES = {
-#     'img_spiders.middlewares.ABProxyMiddleware': 1,
+#     'img_spiders.middlewares.ABProxyMiddleware': 10,
 #     'scrapy.downloadermiddlewares.httpproxy.HttpProxyMiddleware': 110
 #
 # }
@@ -89,8 +90,8 @@ MYSQLINFO = {
     'passwd': 'Su_s1326@aiji',
     'charset': 'utf8'
 }
-
-
+#
+"""布隆过滤器"""
 # Ensure use this Scheduler
 SCHEDULER = "scrapy_redis_bloomfilter.scheduler.Scheduler"
 
@@ -108,6 +109,7 @@ BLOOMFILTER_BIT = 30
 
 # Persist
 SCHEDULER_PERSIST = True
+
 
 # Enable and configure the AutoThrottle extension (disabled by default)
 # See https://doc.scrapy.org/en/latest/topics/autothrottle.html

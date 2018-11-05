@@ -21,7 +21,7 @@ db_port = 3306
 db_name = 'bizhi'
 db_charset = 'utf8'
 
-threadNum = 1000  # 开启线程个数
+threadNum = 1  # 开启线程个数
 lock = threading.Lock()
 
 access_key = 'Uon2lwH6FDLYBhVyGu5jN25PwVCQuNAIf-_PaQ8E'
@@ -49,11 +49,14 @@ proxies = {
 }
 
 headers = {
-    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:57.0) Gecko/20100101 Firefox/57.0',
-    "Referer": "http://www.warting.com/gallery/"
+    "Host": "www.68design.net",
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.67 Safari/537.36",
+    "Connection": "keep-alive",
+    "Referer": "http://www.68design.net/"
 }
 
-def save(title, ctime, tags, info1, info2, info3, pic, link, db):
+
+def save(title, ctime, tags, info1, info2,pic,view_num, link, db):
     cursor = db.cursor()
     ext = pic.split('.')
     if ext:
@@ -66,7 +69,7 @@ def save(title, ctime, tags, info1, info2, info3, pic, link, db):
         print("开始保存图片：", pic)
         ret, info = bucket.fetch(pic, bucket_name, key)
         assert ret['key'] == key
-        print("保存成功",pic)
+        print("保存成功", pic)
         hs = json.loads(info.text_body, encoding="utf-8")['hash']
         url = "http://img.aiji66.com/{}?imageInfo".format(key)
         response = requests.get(url=url)
@@ -82,11 +85,13 @@ def save(title, ctime, tags, info1, info2, info3, pic, link, db):
         if width == height:
             plate_type = 3
         try:
-            sql = "INSERT INTO shejizhijia (title,tags,cdn_path,width,height,size,format,plate_type,info1,info2,info3,link,ctime,hash) " \
-                  "VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"
-            args = (title, tags, key, width, height, size, formats, plate_type, info1, info2,info3,link, ctime, hs)
+            sql = """
+                      INSERT INTO design68 (title,tags,cdn_path,width,height,size,format,plate_type,info1,info2,view_num,link,ctime,hash)
+                      VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s);
+            """
+            args = (title, tags, key, width, height, size, formats, plate_type, info1, info2, int(view_num), link, ctime, hs)
             cursor.execute(sql, args)
-            sql = "DELETE FROM shejizhijia_links WHERE link = '%s'" % (link)
+            sql = "DELETE FROM design68_links WHERE link = '%s'" % (link)
             cursor.execute(sql)
         except Exception as e:
             print('Insert Error：', e, link, sql)
@@ -94,7 +99,7 @@ def save(title, ctime, tags, info1, info2, info3, pic, link, db):
         else:
             db.commit()
     except Exception as e:
-        print("上传失败链接:" ,link,e)
+        print("上传失败链接:", link, e)
     return None
 
 
@@ -109,26 +114,25 @@ def open_link():
             try:
                 html = response.content.decode()
                 tree = etree.HTML(html)
-                title = tree.xpath("//div[@class='articlebox']/h1/text()")
-                pics = tree.xpath("//div[@class='articlebox']/div[@class='artcon']//img/@src")
-                info = tree.xpath("//div[@id='loat6']/a[position()>1]/text()")
-                tags = tree.xpath("//div[@class='zuozhe1']/a/text()")
-                ctime = tree.xpath("//div[@class='zuozhe1']/text()")
+                img_url_list = tree.xpath("//div[@class='picview']//img/@org")
+                title = tree.xpath("//div[@class='left-main workdetail']/h1/text()")
+                infos = tree.xpath("//div[@class='left-main workdetail']/p[1]/a/text()")
+                tags = infos
+                view_num = tree.xpath(
+                    "//div[@class='left-main workdetail']/p[@class='top-icon']/span[2]/text()")
+                ctime = tree.xpath("//div[@class='left-main workdetail']/time/text()")
 
-                if info:
-                    keys = ["info1", "info2", "info3"]
-                    infos = dict(zip(keys, info))
-                    info1 = infos.get('info1', '')
-                    info2 = infos.get('info2', '')
-                    info3 = infos.get('info3', '')
-                    tags.extend(info)
+                if infos:
+                    keys = ["info1", "info2"]
+                    info_dict = dict(zip(keys, infos))
+                    info1 = info_dict.get('info1', '')
+                    info2 = info_dict.get('info2', '')
                 else:
                     info1 = ""
                     info2 = ""
-                    info3 = ""
 
                 if title:
-                    title = title[0]
+                    title = "".join(title).strip()
                 else:
                     title = ''
                 if tags:
@@ -137,14 +141,20 @@ def open_link():
                     tags = ''
 
                 if ctime:
-                    ctime = re.findall(r'(\d{4}-\d{1,2}-\d{1,2})', ctime[0])[0]
+                    ctime = re.findall(r'(\d{4}-\d{1,2}-\d{1,2} \d{1,2}:\d{1,2})', ctime[0])[0]
                 else:
-                    ctime = '0000-00-00 00:00:00'
+                    ctime = "0000-00-00 00:00:00"
 
-                if pics:
-                    for pic in pics:
+                if view_num:
+                    view_num = view_num[0]
+                else:
+                    view_num = "0"
+
+                link = response.url
+                if img_url_list:
+                    for pic in img_url_list:
                         pic = pic.rsplit("?")[0]
-                        save(title, ctime, tags, info1, info2, info3, pic,link, db)
+                        save(title, ctime, tags, info1, info2, pic,view_num,link, db)
             except Exception as e:
                 print("Error：", e, threading.current_thread().name)
         except StopIteration as e:
@@ -155,7 +165,7 @@ def open_link():
 def main():
     db = pymysql.connect(db_host, db_user, db_password, db_name, charset=db_charset, port=db_port)
     cursor = db.cursor()
-    sql = "SELECT link FROM shejizhijia_links order by id asc "
+    sql = "SELECT link FROM design68_links order by id asc "
     cursor.execute(sql)
     result = cursor.fetchall()
     db.close()

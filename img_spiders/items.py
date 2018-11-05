@@ -11,9 +11,10 @@ import scrapy
 class ImgSpidersItem(scrapy.Item):
     # define the fields for your item here like:
     title = scrapy.Field()
-    pics = scrapy.Field()
+    cdn_path = scrapy.Field()
     ctime = scrapy.Field()
     info1 = scrapy.Field()
+    info2 = scrapy.Field()
     view_num = scrapy.Field()
     tags = scrapy.Field()
     link = scrapy.Field()
@@ -22,6 +23,7 @@ class ImgSpidersItem(scrapy.Item):
     size = scrapy.Field()
     formats = scrapy.Field()
     plate_type = scrapy.Field()
+    hs = scrapy.Field()
 
 
 class SheJiDiGuo(scrapy.Item):

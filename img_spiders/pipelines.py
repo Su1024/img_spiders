@@ -26,14 +26,28 @@ class MysqlTwistedPipline(object):
         #根据不同的item 构建不同的sql语句并插入到mysql中
         insert_sql, params = self.get_insert_sql(item)
         cursor.execute(insert_sql, params)
-        print("链接地址保存成功:", item['link'])
+        print("链接保存成功:", item['link'])
 
-    def get_insert_sql(self,item):
+    def get_insert_sql(self, item):
         insert_sql = """
-                     INSERT INTO shejizhijia_links (link) VALUES(%s);
-                 """
+               INSERT INTO design68_links (link)
+               VALUES(%s);
+                    """
         params = (
-            item['link'])
+            item['link']
+        )
         return insert_sql, params
+
+    # def get_insert_sql(self,item):
+    #     insert_sql = """
+    #         INSERT INTO design68 (title,tags,cdn_path,width,height,size,format,plate_type,info1,info2,view_num,link,ctime,hash)
+    #         VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s);
+    #              """
+    #     params = (
+    #         item['title'],item['tags'],item['cdn_path'],item['width'],item['height'],item['size'],
+    #         item['formats'],item['plate_type'],item['info1'],item['info2'],item['view_num'],item['link'],
+    #         item['ctime'],item['hs']
+    #     )
+    #     return insert_sql, params
 
 
