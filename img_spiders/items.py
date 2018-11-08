@@ -26,5 +26,10 @@ class ImgSpidersItem(scrapy.Item):
     hs = scrapy.Field()
 
 
+class UplabsItem(scrapy.Item):
+    link = scrapy.Field()
+    category = scrapy.Field()
+
+
 class SheJiDiGuo(scrapy.Item):
     link = scrapy.Field()

@@ -22,6 +22,7 @@ LOG_LEVEL = "WARNING"
 # Obey robots.txt rules
 ROBOTSTXT_OBEY = False
 
+
 # HTTPERROR_ALLOWED_CODES = [429]
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
 CONCURRENT_REQUESTS = 300

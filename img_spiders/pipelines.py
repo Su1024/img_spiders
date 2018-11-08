@@ -30,11 +30,12 @@ class MysqlTwistedPipline(object):
 
     def get_insert_sql(self, item):
         insert_sql = """
-               INSERT INTO design68_links (link)
-               VALUES(%s);
+               INSERT INTO uplabs_links (link,category)
+               VALUES(%s,%s);
                     """
         params = (
-            item['link']
+            item['link'],
+            item['category']
         )
         return insert_sql, params
 
